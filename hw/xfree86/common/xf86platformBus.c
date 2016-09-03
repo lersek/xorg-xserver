@@ -450,9 +450,8 @@ xf86platformProbeDev(DriverPtr drvp)
         if (j == xf86_num_platform_devices)
              continue;
 
-        foundScreen = probeSingleDevice(&xf86_platform_devices[j], drvp, devList[i], 0);
-        if (!foundScreen)
-            continue;
+        foundScreen |= probeSingleDevice(&xf86_platform_devices[j], drvp,
+                                         devList[i], 0);
     }
 
     /* if autoaddgpu devices is enabled then go find any unclaimed platform
