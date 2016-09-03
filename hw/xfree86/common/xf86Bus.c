@@ -119,9 +119,9 @@ xf86BusConfig(void)
     int i, j;
 
     /*
-     * Now call each of the Probe functions.  Each successful probe will
-     * result in an extra entry added to the xf86Screens[] list for each
-     * instance of the hardware found.
+     * Now call each of the Probe functions.  Each successful probe will result
+     * in an extra entry added to the xf86Screens[] list, or -- optionally --
+     * to the xf86GPUScreens[] list, for each instance of the hardware found.
      */
     for (i = 0; i < xf86NumDrivers; i++) {
         xf86CallDriverProbe(xf86DriverList[i], FALSE);
