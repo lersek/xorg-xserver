@@ -127,10 +127,23 @@ xf86BusConfig(void)
         xf86CallDriverProbe(xf86DriverList[i], FALSE);
     }
 
-    /* If nothing was detected, return now */
     if (xf86NumScreens == 0) {
-        xf86Msg(X_ERROR, "No devices detected.\n");
-        return FALSE;
+        if (xf86NumGPUScreens == 0) {
+            /* If nothing was detected, return now */
+            xf86Msg(X_ERROR, "No devices detected.\n");
+            return FALSE;
+        }
+
+        /*
+         * If no screen was detected, but there is at least one GPU screen,
+         * promote one of the latter to be the single screen. Note that a
+         * graphics card matched by a Device.BusID (i.e., from the config file)
+         * is added as a screen, not as a GPU screen; so if that happens, we
+         * don't reach this code.
+         */
+        xf86PromoteLastGPUScreenToLastScreen();
+        xf86Msg(X_WARNING, "Use Device.BusID to select a specific secondary "
+                "graphics card.\n");
     }
 
     xf86VGAarbiterInit();

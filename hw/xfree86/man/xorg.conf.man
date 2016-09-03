@@ -1353,11 +1353,22 @@ the
 string has the form
 .BI PCI: bus : device : function
 (e.g., \(lqPCI:1:0:0\(rq might be appropriate for an AGP card).
-This field is usually optional in single-head configurations when using
-the primary graphics card.
-In multi-head configurations, or when using a secondary graphics card in a
-single-head configuration, this entry is mandatory.
-Its main purpose is to make an unambiguous connection between the device
+In multi-head configurations, this entry is mandatory.
+It is usually optional in single-head configurations when using the primary
+graphics card.
+When using a secondary graphics card in a single-head configuration,
+.B BusID
+is recommended; if no graphics card can be identified as primary, nor is any
+card selected by at least one
+.B Device
+section through the
+.B BusID
+field, then an unspecified secondary card (if any) is promoted to primary
+status.
+The main purpose of
+.B BusID
+is to make an unambiguous connection between the
+.B Device
 section and the hardware it is representing.
 This information can usually be found by running the pciaccess tool
 scanpci.
