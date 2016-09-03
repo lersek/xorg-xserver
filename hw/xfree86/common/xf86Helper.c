@@ -281,6 +281,49 @@ xf86DeleteScreen(ScrnInfoPtr pScrn)
 }
 
 /*
+ * Promote (move) the last entry from xf86GPUScreens to the last entry in
+ * xf86Screens. The caller is responsible for ensuring that on input,
+ * xf86GPUScreens is not empty, and that xf86Screens contains fewer than
+ * GPU_SCREEN_OFFSET elements.
+ *
+ * This function is only valid to call for DDX, not DIX, purposes; i.e., during
+ * the initial hardware enumeration in InitOutput() -> xf86BusConfig(). In
+ * particular it does not care about the screenInfo.screens and
+ * screenInfo.gpuscreens arrays.
+ */
+
+void
+xf86PromoteLastGPUScreenToLastScreen(void)
+{
+    ScrnInfoPtr pScrn;
+    int i;
+
+    assert(xf86NumGPUScreens > 0);
+    assert(xf86NumScreens < GPU_SCREEN_OFFSET);
+
+    pScrn = xf86GPUScreens[xf86NumGPUScreens - 1];
+    assert(pScrn->is_gpu);
+    assert(pScrn->scrnIndex >= GPU_SCREEN_OFFSET);
+
+    xf86DrvMsg(pScrn->scrnIndex, X_WARNING,
+               "promoting secondary graphics card...\n");
+
+    /*
+     * Don't reallocate xf86GPUScreens because (a) xf86DeleteScreen() does
+     * neither, (b) xnfreallocarray() doesn't support complete freeing.
+     */
+    xf86NumGPUScreens--;
+    i = xf86NumScreens++;
+    xf86Screens = xnfreallocarray(xf86Screens, xf86NumScreens, sizeof pScrn);
+    xf86Screens[i] = pScrn;
+    pScrn->is_gpu = FALSE;
+    pScrn->scrnIndex = i;
+    /* don't change pScrn->origIndex */
+
+    xf86DrvMsg(pScrn->scrnIndex, X_WARNING, "... to primary.\n");
+}
+
+/*
  * Allocate a private in ScrnInfoRec.
  */
 
